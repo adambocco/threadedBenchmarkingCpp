@@ -90,7 +90,7 @@ void writeOutResults(std::vector<int> threads,
     std::ofstream out;
     out.open("results.py");
 
-    out << "threadedIOPS = {\n";
+    out << "threadedIOPSResults = {\n";
     for (int i = 0; i < threads.size(); i++) {
         out << "\t" << std::to_string(threads[i]) << " : [\n";
         for (int j = 0; j < threadedIOPSResults[i].size(); j++) {
@@ -100,7 +100,7 @@ void writeOutResults(std::vector<int> threads,
     }
     out << "}\n\n";
 
-    out << "threadedFLOPS = {\n";
+    out << "threadedFLOPSResults = {\n";
     for (int i = 0; i < threads.size(); i++) {
         out << "\t" << std::to_string(threads[i]) << " : [\n";
         for (int j = 0; j < threadedFLOPSResults[i].size(); j++) {
@@ -113,14 +113,14 @@ void writeOutResults(std::vector<int> threads,
     out << "threadedIOPS = {\n";
     for (int i = 0; i < threads.size(); i++) {
         out << "\t" << std::to_string(threads[i]) << " : ";
-            out << threadedIOPS[i] << ",\n";
+        out << threadedIOPS[i] << ",\n";
     }
     out << "}\n\n";
 
     out << "threadedFLOPS = {\n";
     for (int i = 0; i < threads.size(); i++) {
         out << "\t" << std::to_string(threads[i]) << " : ";
-            out << threadedFLOPS[i] << ",\n";
+        out << threadedFLOPS[i] << ",\n";
     }
     out << "}\n";
 
@@ -134,9 +134,9 @@ int main(int argc, char const *argv[]) {
     std::vector<long> operations;
 
     long totalOps = 0;
-    for (int i = 1; i < 2; i++) {
-        operations.push_back(i*1e8);
-        totalOps += (i*1e8);
+    for (int i = 1; i < 1000; i++) {
+        operations.push_back(i*1e5);
+        totalOps += (i*1e5);
     }
 
     // Run threaded tests for IOPS and FLOPS
