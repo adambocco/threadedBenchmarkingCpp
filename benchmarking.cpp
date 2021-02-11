@@ -1,6 +1,7 @@
 
 // To compile in bash "g++ -std=c++17 benchmarking.cpp -o bm -lpthread"
 // To run "./bm" 
+#include <thread>
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -11,9 +12,6 @@
 #include <vector>
 #include <array>
 #include <fstream>
-#include <stack>
-#include <algorithm>
-#include <thread>
 #include <chrono> 
 #include <sstream>
 #include "chalk.h"
@@ -24,6 +22,8 @@ using namespace chalk;
 void integerOperations(long ops) {for (long i = 0; i < ops; i+=1) {}}
 
 void floatingPointOperations(long ops) {for (double long i = 0; i < ops; i+=1.0) {}}
+
+
 
 std::map<long, double> unthreadedTest(std::vector<long> operations, bool iops) {
 
@@ -185,7 +185,7 @@ void writeOutResults(std::vector<int> &threads,
 }
 
 int main(int argc, char const *argv[]) {
-
+    std::cout << "file started" << std::endl;
     // Define tests inputs: Number of threads running concurrently / For how many operations
     std::vector<int> threads;
     std::vector<long> operations;   
@@ -195,8 +195,7 @@ int main(int argc, char const *argv[]) {
     bool useDefaults = false;
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
-        std::cout << arg << std::endl;
-        if (arg.compare("--default") == 0 || arg.compare("-d")) {
+        if (arg.compare("--default") == 0 || arg.compare("-d") == 0) {
             useDefaults = true;
             // Default test values
             threads = {1, 2, 4, 8};
@@ -211,14 +210,15 @@ int main(int argc, char const *argv[]) {
         std::cout << fg::Blue.Wrap("Enter one or more number of threads to test ( ',' comma delimited; EX: 1,2,4,8 ) :\n");
         std::cin >> userInput;
         std::stringstream ss1(userInput);
-
+        std::cout << "Threads: ";
         for (int i; ss1 >> i;) {
             threads.push_back(i);    
+            std::cout << i <<",";
             if (ss1.peek() == ',')
                 ss1.ignore();
         }
         userInput = "";
-        std::cout << fg::Blue.Wrap("Enter one or more number of operations to test ( ',' comma delimited; EX: 1000,10000,50000,100000 ) :\n");
+        std::cout << fg::Blue.Wrap("\nEnter one or more number of operations to test ( ',' comma delimited; EX: 1000,10000,50000,100000 ) :\n");
         std::cin >> userInput;
         std::stringstream ss2(userInput);
         for (long i; ss2 >> i;) {
@@ -228,7 +228,7 @@ int main(int argc, char const *argv[]) {
                 ss2.ignore();
         }
     }
-    std::cout << totalOps << std::endl;
+    std::cout << "Total operations: " << totalOps << std::endl;
 
     // Run threaded tests for IOPS and FLOPS
     std::vector< std::vector< std::vector<double> >> threadedResultsIOPS = threadedTest(operations, threads, true);
