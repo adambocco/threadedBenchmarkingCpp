@@ -19,9 +19,9 @@
 using namespace chalk;
 
 
-void integerOperations(long ops) {for (long i = 0; i < ops; i+=1) {}}
+void integerOperations(long ops) {for (long i = 0; i < ops; i+=1L) {}}
 
-void floatingPointOperations(long ops) {for (double long i = 0; i < ops; i+=1.0) {}}
+void floatingPointOperations(long ops) {for (double long i = 0; i < ops; i+=1.0L) {}}
 
 
 
@@ -58,7 +58,7 @@ std::map<long, double> unthreadedTest(std::vector<long> operations, bool iops) {
 }
 
 // Run threaded tests for all combinations of threads and operations
-std::vector< std::vector< std::vector<double> > > threadedTest(std::vector<long> operations, std::vector<int> threads, bool iops) {
+std::vector<std::vector<std::vector<double>>> threadedTest(std::vector<long> operations, std::vector<int> threads, bool iops) {
 
     // Instantiate return vector
     std::vector< std::vector< std::vector<double> >> threadedResults;
@@ -185,7 +185,7 @@ void writeOutResults(std::vector<int> &threads,
 }
 
 int main(int argc, char const *argv[]) {
-    std::cout << "file started" << std::endl;
+
     // Define tests inputs: Number of threads running concurrently / For how many operations
     std::vector<int> threads;
     std::vector<long> operations;   
@@ -193,9 +193,10 @@ int main(int argc, char const *argv[]) {
 
     // Handle command line arguments
     bool useDefaults = false;
+    bool verbose = false;
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
-        if (arg.compare("--default") == 0 || arg.compare("-d") == 0) {
+        if (arg.compare("--default") == 0) {
             useDefaults = true;
             // Default test values
             threads = {1, 2, 4, 8};
@@ -204,7 +205,39 @@ int main(int argc, char const *argv[]) {
                 totalOps += (i*1e7);
             }
         }
+        else if (arg.compare("--verbose") == 0) {
+            verbose = true;
+        }
+        else if (arg.compare("-d") == 0 && !useDefaults) {
+            useDefaults = true;
+            // Default test values
+            threads = {1, 2, 4, 8};
+            for (int i = 1; i < 5; i+=1) {
+                operations.push_back(i*1e7);
+                totalOps += (i*1e7);
+            }
+        }
+        else if (arg.compare("-v") == 0) {
+            verbose = true;
+        } 
+        else if (arg.compare("-dv") == 0 || arg.compare("-vd") == 0) {
+            verbose = true;
+            if (!useDefaults) {
+                useDefaults = true;
+                // Default test values
+                threads = {1, 2, 4, 8};
+                for (int i = 1; i < 5; i+=1) {
+                    operations.push_back(i*1e7);
+                    totalOps += (i*1e7);
+                }
+            }
+        } 
+        else {
+            std::cout << bg::Red.Wrap("Invalid Options") << std::endl;
+            return 0;
+        }
     }
+
     if (!useDefaults) {
         std::string userInput = "";
         std::cout << fg::Blue.Wrap("Enter one or more number of threads to test ( ',' comma delimited; EX: 1,2,4,8 ) :\n");
@@ -228,6 +261,8 @@ int main(int argc, char const *argv[]) {
                 ss2.ignore();
         }
     }
+
+    // TODO: Implement verbose option
     std::cout << "Total operations: " << totalOps << std::endl;
 
     // Run threaded tests for IOPS and FLOPS
