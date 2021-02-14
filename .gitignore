@@ -1,4 +1,8 @@
 .vscode
-__pycache__
+.dist
+*__pycache__*
 bm
 results.py
+test.cpp
+env
+venv
