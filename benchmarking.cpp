@@ -19,6 +19,21 @@
 
 using namespace chalk;
 
+// // ALTERNATIVE TESTING - WHILE LOOP 
+// void integerOperations(unsigned long long ops) {
+//     unsigned long long accumulator = 0;
+//     while (accumulator < ops) {
+//         accumulator += 1L;
+//     }
+// }
+
+// void floatingpointOperations(unsigned long long ops) {
+//     double long accumulator = 0;
+//     while (accumulator < ops) {
+//         accumulator += 1.0L;
+//     }
+// }
+
 
 void integerOperations(unsigned long long ops) {for (unsigned long long i = 0; i < ops; i+=1L) {}}
 
@@ -265,11 +280,11 @@ unsigned long long handleUserInput(std::vector<long> &threads, std::vector<unsig
     std::stringstream ss2(userInput);
     for (unsigned long long i; ss2 >> i;) {
         operations.push_back(i);   
-        std::cout << "Operation entered:" << i << std::endl; 
         totalOps += i;
         if (ss2.peek() == ',')
             ss2.ignore();
     }
+    std::cout << "Total Operations: " << totalOps << std::endl; 
     return totalOps;
 }
 
@@ -284,23 +299,15 @@ int main(int argc, char const *argv[]) {
     bool useDefaults = default_verbose.first;
     bool verbose = default_verbose.second;
 
-    // <------------DEFAULT VALUES------------->
+
     if (useDefaults) {
-
-        // TEST CASE 2
+    // <------------DEFAULT VALUES------------->
         threads = {1, 2, 4, 8};
-
-        for (unsigned long long g = (unsigned long long)5e8; g <=(unsigned long long)1e10; g+=(unsigned long long)5e8) {
+        for (unsigned long long g = (unsigned long long)1e8; g <=(unsigned long long)5e8; g+=(unsigned long long)1e8) {
             operations.push_back(g);
             totalOps += g;
         }
-
-        // ORIGINAL
-        // threads = {1, 2, 4, 8};
-        // for (long i = 1; i < 5; i+=1) {
-        //     operations.push_back(i*1e7);
-        //     totalOps += (i*1e7);
-        // }
+    // ^------------DEFAULT VALUES-------------^
     }
     else {
         totalOps = handleUserInput(threads, operations);
@@ -310,14 +317,15 @@ int main(int argc, char const *argv[]) {
         std::cout << fmt::Bold.Wrap(fg::Yellow.Wrap("\n<------------------Detailed Results------------------>\n"));
     }
 
-    // Run threaded tests for IOPS and FLOPS
-    std::vector< std::vector< std::pair<unsigned long long, double long> >> threadedResultsIOPS = threadedTest(operations, threads, true, verbose);
-    std::vector< std::vector< std::pair<unsigned long long, double long> >> threadedResultsFLOPS = threadedTest(operations, threads, false, verbose);
-
     // Run unthreaded tests for IOPS and FLOPS
     std::vector<std::pair<unsigned long long, double long>> unthreadedIOPSResults = unthreadedTest(operations, true, verbose);
     std::vector<std::pair<unsigned long long, double long>> unthreadedFLOPSResults = unthreadedTest(operations, false, verbose);
 
+
+
+    // Run threaded tests for IOPS and FLOPS
+    std::vector< std::vector< std::pair<unsigned long long, double long> >> threadedResultsIOPS = threadedTest(operations, threads, true, verbose);
+    std::vector< std::vector< std::pair<unsigned long long, double long> >> threadedResultsFLOPS = threadedTest(operations, threads, false, verbose);
 
     unsigned long long unthreadedIOPS, unthreadedFLOPS;
     double long sumTime = 0;

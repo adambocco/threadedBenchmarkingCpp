@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import sys
 import argparse
 import numpy as np
+from simple_chalk import chalk, blue, yellow ,green
 
 from results import threadedIOPSResults, threadedFLOPSResults, threadedIOPS, threadedFLOPS
 
@@ -15,6 +16,10 @@ parser.add_argument("-t", "--optimeflops", help="Operations versus time for all 
 parser.add_argument("-i", "--iops", help="Numbers of threads versus Giga IOPS",
                     action="store_true")
 parser.add_argument("-f", "--flops", help="Numbers of threads versus Giga FLOPS",
+                    action="store_true")
+parser.add_argument("-n", "--homoiops", help="Numbers of threads versus Giga FLOPS",
+                    action="store_true")
+parser.add_argument("-m", "--homoflops", help="Numbers of threads versus Giga FLOPS",
                     action="store_true")
 args = parser.parse_args()
 
@@ -64,17 +69,12 @@ def iops():
         ops = []
         avgs = []
 
-        tempForStd = []
         for j in threadedIOPSResults[i]:
 
             ops.append(j[0])
             
             avgs.append(j[1])
-            try:
-                tempForStd.append((j[0]/j[1])/1e9)
-            except ZeroDivisionError:
-                tempForStd.append(0)
-        print("Standard deviation of Figure 3 GigaIOPS on thread : "+str(i)+ " :: ", np.std(tempForStd))
+
         x = np.array(ops)
         y = np.array(avgs)
 
@@ -102,18 +102,11 @@ def flops():
         ops = []
         avgs = []
 
-        tempForStd = []
         for j in threadedFLOPSResults[i]:
 
             ops.append(j[0])
             
             avgs.append(j[1])
-            try:
-                tempForStd.append((j[0]/j[1])/1e9)
-            except ZeroDivisionError:
-                tempForStd.append(0)
-        print("Standard deviation of Figure 3 GigaFLOPS on thread : "+str(i)+ " :: ", np.std(tempForStd))
-
 
         x = np.array(ops)
         y = np.array(avgs)
@@ -127,51 +120,71 @@ def flops():
     plt.legend(fancybox=True, loc=2, title="# of Threads")
 
 
+
 def homoOpsIOPS():
     plt.figure(5)
-    plt.xlabel("Giga IOPS")
-    plt.ylabel("Threads")
-    plt.title("Threads versus IOPS \n20 iterations of 1e10 operations")
+    plt.xlabel("Threads")
+    plt.ylabel("Giga IOPS")
+
     x = []
     y = []
-
+    iterations = 0
     for j in threadedIOPSResults: 
-        tempForStd = []
+        iterations = len(threadedIOPSResults[j])
         for n in threadedIOPSResults[j]:
-            y.append(int(j))
-            x.append((n[0]/n[1])/1e9)
-            tempForStd.append((n[0]/n[1])/1e9)
-        stddev = np.array(tempForStd).std()
-        print("Standard deviation for homoOpsIOPS on IOPS, threads: "+str(j)+" :::   " + str(stddev))
+            x.append(int(j))
+            y.append((n[0]/n[1])/1e9)
+
+
     x = np.array(x)
     y = np.array(y)
     m, b = np.polyfit(x, y, 1)
+    plt.title(f"Threads versus IOPS over\n{iterations} iterations per numbers of threads")
     plt.plot(x, y, 'o',marker=".", markersize=5)
     plt.plot(x, m*x+b)
 
 
 def homoOpsFLOPS():
     plt.figure(6)
-    plt.xlabel("Giga FLOPS")
-    plt.ylabel("Threads")
-    plt.title("Threads versus FLOPS \n20 iterations of 1e10 operations")
+    plt.xlabel("Threads")
+    plt.ylabel("Giga FLOPS")
     x = []
     y = []
+    iterations = 0
     for j in threadedFLOPSResults:
-        tempForStd = [] 
+        iterations = len(threadedFLOPSResults[j])
         for n in threadedFLOPSResults[j]:
-            y.append(int(j))
-            x.append((n[0]/n[1])/1e9)
-            tempForStd.append((n[0]/n[1])/1e9)
-        stddev = np.array(tempForStd).std()
-        print("Standard deviation for homoOpsIOPS on FLOPS, threads: "+str(j)+" :::   " + str(stddev))
+            x.append(int(j))
+            y.append((n[0]/n[1])/1e9)
+
     x = np.array(x)
     y = np.array(y)
     m, b = np.polyfit(x, y, 1)
+    plt.title(f"Threads versus FLOPS over\n{iterations} iterations per numbers of threads")
     plt.plot(x, y, 'o',marker=".", markersize=5)
     plt.plot(x, m*x+b)
 
 
+def standardDeviation():
+    print(chalk.blue("<------------- Standard Deviation ------------->\n"))
+    print(chalk.green("<------------- Giga IOPS ------------->\n"))
+    for i in threadedIOPSResults: # For all the thread numbers
+        std = []
+        for j in threadedIOPSResults[i]:
+            try:
+                std.append((j[0]/j[1])/1e9)
+            except ZeroDivisionError:
+                std.append(0)
+        print(chalk.yellow(str(i)+ " threads: " + str(np.std(std))))
+    print(chalk.green("\n<------------- Giga IOPS ------------->\n"))
+    for i in threadedFLOPSResults: # For all the thread numbers
+        std = []
+        for j in threadedFLOPSResults[i]:
+            try:
+                std.append((j[0]/j[1])/1e9)
+            except ZeroDivisionError:
+                std.append(0)
+        print(chalk.yellow(str(i)+ " threads: " + str(np.std(std))))
 
 
 
@@ -192,6 +205,10 @@ else:
         iops()
     if args.flops:
         flops()
+    if args.homoiops:
+        homoOpsIOPS()
+    if args.homoflops:
+        homoOpsFLOPS()
 
-
+standardDeviation()
 plt.show()

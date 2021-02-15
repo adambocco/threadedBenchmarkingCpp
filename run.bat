@@ -1,5 +1,5 @@
 @ECHO OFF
 
-.\bm.exe -d
+.\bm.exe -dv
 
 python3 graphing.py -a

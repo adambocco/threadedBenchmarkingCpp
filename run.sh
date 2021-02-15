@@ -1,5 +1,5 @@
 #!/bin/bash
 
-./bm.exe -d
+./bm -dv
 
 python3 graphing.py -a
